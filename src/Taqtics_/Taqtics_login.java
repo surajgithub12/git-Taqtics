@@ -135,9 +135,10 @@ public class Taqtics_login {
 		Assert.assertEquals(actualErrorMessage, expectedErrorMessage,
 				"The error message does not match the expected message.");
 	}
-}
 
-// @AfterMethod
-// public void tearDown() {
-// driver.quit();
-// }
+
+ @AfterMethod
+ public void tearDown() {
+ driver.quit();
+ }
+}
