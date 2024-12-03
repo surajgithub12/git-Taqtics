@@ -1,0 +1,83 @@
+I have not worked much on API automation testing but I have tried to test API endpoint. 
+I have written test cases on Excel sheet and designed Automation test script using TestNG framework
+
+
+import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
+import io.restassured.response.Response;
+import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
+public class ApiTestCases {
+
+    // Base URL for the API
+    private static final String BASE_URL = "https://landmark.taqtics.co";
+    private static final String AUTH_TOKEN_ENDPOINT = "https://landmark.taqtics.co/api-docs/#/Authentication/post_v1_external_generateAuthToken";
+
+    @BeforeClass
+    public void setup() {
+        // Set up the base URI for RestAssured
+        RestAssured.baseURI = BASE_URL;
+    }
+
+    @Test(priority = 1, description = "Verify for successful authentication with valid credentials")
+    public void testAuthTokenWithValidCredentials() {
+        String requestBody = "{ \"email\": \"String@gmail.com\", \"password\": \"String\" }";
+
+        Response response = RestAssured.given().contentType(ContentType.JSON.body(requestBody).when().post(AUTH_TOKEN_ENDPOINT);
+
+        // Verify the response status code and the presence of the token in the response body
+        Assert.assertEquals(response.getStatusCode(), 200, "Expected HTTP status code 200");
+        Assert.assertTrue(response.getBody().asString().contains("token"), "Response body should contain a valid token");
+    }
+
+    @Test(priority = 2, description = "Verify for authentication failure with invalid Email")
+    public void testAuthTokenWithInvalidEmail() {
+        String requestBody = "{ \"email\": \"String@gmai.cm\", \"password\": \"String\" }";
+
+        Response response = RestAssured.given().contentType(ContentType.JSON).body(requestBody).when().post(AUTH_TOKEN_ENDPOINT);
+
+        // Verify the response status code and error message for invalid email
+        Assert.assertEquals(response.getStatusCode(), 400, "Expected HTTP status code 400");
+        Assert.assertTrue(response.getBody().asString().contains("Invalid email"), "Expected error message indicating invalid email");
+    }
+
+    @Test(priority = 3, description = "Verify for authentication failure with an invalid Password")
+    public void testAuthTokenWithInvalidPassword() {
+        String requestBody = "{ \"email\": \"String@gmail.com\", \"password\": \"String123\" }";
+
+        Response response = RestAssured.given().contentType(ContentType.JSON).body(requestBody).when().post(AUTH_TOKEN_ENDPOINT);
+
+        // Verify the response status code and error message for invalid password
+        Assert.assertEquals(response.getStatusCode(), 400, "Expected HTTP status code 400");
+        Assert.assertTrue(response.getBody().asString().contains("User not found"), "Expected error message indicating invalid password");
+    }
+
+    @Test(priority = 4, description = "Verify for API response with an empty email and password field")
+    public void testAuthTokenWithEmptyCredentials() {
+        String requestBody = "{ \"email\": \"\", \"password\": \"\" }";
+
+        Response response = RestAssured.given().contentType(ContentType.JSON).body(requestBody).when().post(AUTH_TOKEN_ENDPOINT);
+
+        // Verify the response status code and error message for missing email and password
+        Assert.assertEquals(response.getStatusCode(), 400, "Expected HTTP status code 400");
+        Assert.assertTrue(response.getBody().asString().contains("User not found"), "Expected error message indicating missing credentials");
+    }
+
+    @Test(priority = 5, description = "Verify for API response when email id or password is missing")
+    public void testAuthTokenWithMissingPassword() {
+        String requestBody = "{ \"email\": \"String@gmail.com\", \"password\": \"\" }";
+
+        Response response = RestAssured.given().contentType(ContentType.JSON).body(requestBody).when().post(AUTH_TOKEN_ENDPOINT);
+
+        // Verify the response status code and error message for missing password
+        Assert.assertEquals(response.getStatusCode(), 400, "Expected HTTP status code 400");
+        Assert.assertTrue(response.getBody().asString().contains("User not found"), "Expected error message indicating missing password");
+    }
+@AfterClass
+public void tearDown() {
+ driver.quit();
+}
+
+}
